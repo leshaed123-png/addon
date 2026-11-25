@@ -7,21 +7,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      
+
       - name: Unzip project
-        run: unzip pbcity.zip
+        run: unzip -q pbcity.zip
 
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 17
+
       - uses: gradle/actions/setup-gradle@v3
         with:
           gradle-version: 8.1.1
+
       - name: Build
-        run: gradle build --no-daemon --stacktrace
+        run: |
+          PROJECT_DIR=$(dirname $(find . -name "build.gradle*" | head -n 1))
+          echo "PROJECT_DIR=$PROJECT_DIR" >> $GITHUB_ENV
+          cd "$PROJECT_DIR"
+          gradle build --no-daemon --stacktrace
+
       - name: Upload jar
         uses: actions/upload-artifact@v4
         with:
           name: pbcity-jar
-          path: build/libs/*.jar
+          path: ${{ env.PROJECT_DIR }}/build/libs/*.jar
