@@ -2,14 +2,20 @@ name: build
 on:
   push:
   workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
 
       - name: Unzip project
-        run: unzip -q pbcity.zip
+        run: |
+          ls -lh pbcity.zip
+          file pbcity.zip
+          unzip -q pbcity.zip || 7z x pbcity.zip -y
 
       - uses: actions/setup-java@v4
         with:
@@ -32,3 +38,4 @@ jobs:
         with:
           name: pbcity-jar
           path: ${{ env.PROJECT_DIR }}/build/libs/*.jar
+
